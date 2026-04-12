@@ -27,7 +27,6 @@ export default function AIChat({ lang }: { lang: Language }) {
     }
   }, [messages, loading]);
 
-  // --- AUDIO OUTPUT (TTS) ---
   const speak = (text: string) => {
     if (typeof window !== "undefined" && window.speechSynthesis) {
       window.speechSynthesis.cancel();
@@ -46,7 +45,6 @@ export default function AIChat({ lang }: { lang: Language }) {
     setIsSpeaking(false);
   };
 
-  // --- VOICE INPUT (STT) ---
   const startListening = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -70,7 +68,7 @@ export default function AIChat({ lang }: { lang: Language }) {
 
     const userMessage = { 
       role: "user", 
-      text: input || (lang === 'hi' ? "फोटो देखें" : "See photo"), 
+      text: input || (lang === 'hi' ? "तस्वीर का विश्लेषण करें" : "Analyze photo"), 
       image: image || undefined 
     };
     
@@ -104,7 +102,7 @@ export default function AIChat({ lang }: { lang: Language }) {
 
   return (
     <div className="flex flex-col h-[600px] w-full bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden relative">
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 bg-slate-50/30">
         <AnimatePresence initial={false}>
           {messages.length === 0 && (
             <motion.div 
@@ -123,9 +121,9 @@ export default function AIChat({ lang }: { lang: Language }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
-              <div className={`flex flex-col gap-2 max-w-[85%] ${msg.role === "user" ? "items-end" : "items-start"}`}>
+              <div className={`flex flex-col gap-2 max-w-[90%] md:max-w-[85%] ${msg.role === "user" ? "items-end" : "items-start"}`}>
                 <div className={`flex items-end gap-2 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                  <div className={`p-2 rounded-xl shadow-sm ${msg.role === "user" ? "bg-blue-600 text-white" : "bg-white border border-slate-200"}`}>
+                  <div className={`p-2 rounded-xl flex-shrink-0 shadow-sm ${msg.role === "user" ? "bg-blue-600 text-white" : "bg-white border border-slate-200"}`}>
                     {msg.role === "user" ? <User size={14} /> : <Bot size={14} className="text-blue-600" />}
                   </div>
                   
@@ -134,7 +132,7 @@ export default function AIChat({ lang }: { lang: Language }) {
                     ? "bg-blue-600 text-white rounded-tr-none shadow-md" 
                     : "bg-white text-slate-800 border border-slate-100 rounded-tl-none shadow-sm"
                   }`}>
-                    {msg.image && <img src={msg.image} className="max-w-xs rounded-xl mb-3 border border-white/20 shadow-sm" />}
+                    {msg.image && <img src={msg.image} className="max-w-full md:max-w-xs rounded-xl mb-3 border border-white/20 shadow-sm" />}
                     <div className="prose prose-sm max-w-none">
                       <ReactMarkdown>{msg.text}</ReactMarkdown>
                     </div>
@@ -167,8 +165,16 @@ export default function AIChat({ lang }: { lang: Language }) {
       </div>
 
       <div className="p-4 bg-white border-t border-slate-100">
-        <div className="flex gap-2 items-center bg-slate-100 p-2 rounded-[2rem] focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
-          <label className="p-3 text-slate-400 hover:text-blue-600 cursor-pointer">
+        {image && (
+          <div className="mb-3 relative inline-block">
+            <img src={image} className="w-16 h-16 object-cover rounded-xl border-2 border-blue-600 shadow-md" />
+            <button onClick={() => setImage(null)} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:scale-110 transition"><X size={10} /></button>
+          </div>
+        )}
+
+        <div className="flex gap-2 items-center bg-slate-100 p-2 rounded-[2rem] focus-within:ring-2 focus-within:ring-blue-500/20 transition-all overflow-hidden">
+          {/* IMAGE UPLOAD - flex-shrink-0 prevents disappearing */}
+          <label className="p-3 text-slate-400 hover:text-blue-600 cursor-pointer flex-shrink-0">
             <ImageIcon size={20} />
             <input type="file" accept="image/*" className="hidden" onChange={(e) => {
               const file = e.target.files?.[0];
@@ -180,19 +186,29 @@ export default function AIChat({ lang }: { lang: Language }) {
             }} />
           </label>
           
-          <button onClick={startListening} className={`p-3 transition-all ${isListening ? "text-red-500 animate-pulse" : "text-slate-400 hover:text-blue-600"}`}>
+          {/* MIC - flex-shrink-0 prevents disappearing */}
+          <button 
+            onClick={startListening} 
+            className={`p-3 flex-shrink-0 transition-all ${isListening ? "text-red-500 animate-pulse" : "text-slate-400 hover:text-blue-600"}`}
+          >
             <Mic size={20} />
           </button>
           
+          {/* INPUT - flex-1 and min-w-0 allows it to shrink on small screens */}
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder={isListening ? t.listening : t.chatPlaceholder}
-            className="flex-1 bg-transparent px-2 py-2 text-sm outline-none text-slate-800 font-medium"
+            className="flex-1 min-w-0 bg-transparent px-2 py-2 text-sm outline-none text-slate-800 font-medium"
           />
           
-          <button onClick={handleSend} disabled={loading} className="p-3 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-200 disabled:opacity-50 transition-all">
+          {/* SEND BUTTON - flex-shrink-0 ensures it stays visible */}
+          <button 
+            onClick={handleSend} 
+            disabled={loading} 
+            className="p-3 bg-blue-600 flex-shrink-0 text-white rounded-2xl hover:bg-blue-700 shadow-lg shadow-blue-200 disabled:opacity-50 transition-all active:scale-95"
+          >
             <Send size={18} />
           </button>
         </div>
