@@ -12,6 +12,11 @@ export const translations = {
     doctorCommand: "Doctor Command Center",
     resolve: "Resolve",
     viewMap: "View on Map",
+        emergencyContacts: "Emergency Contacts",
+  ambulance: "Ambulance (102)",
+  bloodBank: "Blood Bank",
+  hospitalFinder: "Nearby Hospitals",
+  findPHC: "Locate your nearest Primary Health Centre.",
   },
   hi: {
     dashboard: "डैशबोर्ड",
@@ -26,6 +31,11 @@ export const translations = {
     doctorCommand: "डॉक्टर कमांड सेंटर",
     resolve: "हल करें",
     viewMap: "मैप पर देखें",
+    emergencyContacts: "आपातकालीन संपर्क",
+  ambulance: "एम्बुलेंस (102)",
+  bloodBank: "ब्लड बैंक",
+  hospitalFinder: "पास के अस्पताल",
+  findPHC: "अपने निकटतम प्राथमिक स्वास्थ्य केंद्र का पता लगाएं।",
   }
 };
 
