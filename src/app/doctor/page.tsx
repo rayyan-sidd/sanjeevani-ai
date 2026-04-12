@@ -32,7 +32,7 @@ export default function DoctorDashboard() {
   const { user, role, loading } = useAuth();
   const router = useRouter();
   const [emergencies, setEmergencies] = useState<Emergency[]>([]);
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
 
   // --- CONSULTATION SETTINGS ---
   const [isAvailable, setIsAvailable] = useState(true);
